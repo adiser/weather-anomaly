@@ -41,7 +41,8 @@ def respond(anomaly_detector=AnomalyDetector()):
         if key == 'air_temperature' and args[key] < 26: #hacky trick to remove low temperature anomalies
             args[key] = 33
 
-    response = {"items": anomaly_detector(**args)}
+    response = {"anomaly_detections": anomaly_detector(**args)}
+    response.update(args)
 
     # Return the response in json format
     return jsonify(response)
