@@ -1,4 +1,5 @@
 Flask==1.1.2
+gunicorn
 joblib==0.14.1
 numpy==1.18.1
 opencv-python==4.2.0.32
