@@ -38,8 +38,9 @@ def respond(anomaly_detector=AnomalyDetector()):
             args[key] = request_data_gov(key)
             print("requested key {} value {}".format(key, args[key]))
 
-        if key == 'air_temperature' and args[key] < 26: #hacky trick to remove low temperature anomalies
-            args[key] = 33
+        if key == 'air_temperature':
+            if int(args[key]) < 26:  # hacky trick
+                args[key] = 33
 
     response = {"anomaly_detections": anomaly_detector(**args)}
     response.update({'input_to_algorithm':args})  # User defined arguments
