@@ -1,8 +1,28 @@
 # app.py
 from flask import Flask, request, jsonify
-from collections import OrderedDict
 from model import AnomalyDetector
+from datetime import datetime
+import requests
+import urllib
+import json
+
 app = Flask(__name__)
+
+url_dict = {'air_temperature': 'https://api.data.gov.sg/v1/environment/air-temperature/?{}',
+            'rainfall': 'https://api.data.gov.sg/v1/environment/rainfall/?{}',
+            'relative_humidity': 'https://api.data.gov.sg/v1/environment/relative-humidity/?{}',
+            'wind_speed': 'https://api.data.gov.sg/v1/environment/wind-speed/?{}'}
+
+
+def request_data_gov(weather_modality='air_temperature'):
+    url = url_dict[weather_modality]
+    datetime_str = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+    params = {'datetime': datetime_str}
+    full_url = url.format(urllib.parse.urlencode(params))
+    response = requests.get(full_url)
+    reading_value = json.loads(response.content.decode('utf-8'))['items'][0]['readings'][0]["value"] # arbitrary station
+
+    return reading_value
 
 
 @app.route('/getmsg/', methods=['GET'])
@@ -11,19 +31,17 @@ def respond(anomaly_detector=AnomalyDetector()):
 
     args = {'air_temperature': None, 'rainfall': None, 'relative_humidity': None, 'wind_speed': None}
 
-    added_input = False
     for key, value in args.items():
         args[key] = request.args.get(key, None)
-        if not args[key]:
-            raise ValueError("Must supply all weather readings"
-                             )
-    response = {}
 
-    if added_input:
-        response["ERROR"] = "Please provide an input"
-    else:
-        response["CONTENT"] = anomaly_detector(**args)
-        response["MESSAGE"] = f"Welcome  to our awesome platform!!"
+        if not args[key]:
+            args[key] = request_data_gov(key)
+            print("requested key {} value {}".format(key, args[key]))
+
+        if key == 'air_temperature' and args[key] < 26: #hacky trick to remove low temperature anomalies
+            args[key] = 33
+
+    response = {"items": anomaly_detector(**args)}
 
     # Return the response in json format
     return jsonify(response)

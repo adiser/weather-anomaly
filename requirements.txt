@@ -1,4 +1,7 @@
 Flask==1.1.2
+json
+requests
+urllib
 gunicorn
 joblib==0.14.1
 numpy==1.18.1
