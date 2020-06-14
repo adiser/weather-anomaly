@@ -38,14 +38,11 @@ def respond(anomaly_detector=AnomalyDetector()):
             args[key] = request_data_gov(key)
             print("requested key {} value {}".format(key, args[key]))
 
-        if key == 'air_temperature':
-            if int(args[key]) < 26:  # hacky trick
-                args[key] = 33
-
     response = {"anomaly_detections": anomaly_detector(**args)}
     response.update({'input_to_algorithm':args})  # User defined arguments
     response.update({'real_readings':{k: request_data_gov(k) for k in args}}) #real readings
 
+    print(response)
     # Return the response in json format
     return jsonify(response)
 
