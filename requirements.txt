@@ -24,6 +24,6 @@ testpath==0.4.4
 tornado==6.0.3
 traitlets==4.3.3
 webencodings==0.5.1
-Werkzeug==1.0.1
+Werkzeug==2.2.3
 widgetsnbextension==3.5.1
 zipp==2.1.0
